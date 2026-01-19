@@ -16,11 +16,11 @@
     (else (or (eq? (car lat) x)
               (member? x (cdr lat))))))
 
-(define (rember x lat)
-  (cond ((null? lat) '())
-        ((eq? (car lat) x) (cdr lat))
-        (else (cons (car lat)
-                    (rember x (cdr lat))))))
+(define (rember s l)
+  (cond ((null? l) '())
+        ((equal? (car l) s) (cdr l))
+        (else (cons (car l)
+                    (rember s (cdr l))))))
 
 (define (firsts l)
   (cond ((null? l) '())
@@ -237,3 +237,31 @@
                (else (cons (car l) (insertL* new old (cdr l))))))
          (else (cons (insertL* new old (car l))
                      (insertL* new old (cdr l))))))
+
+(define (member* a l)
+  (cond ((null? l) #f)
+        ((atom? (car l))
+         (or (eqan? (car l) a)
+             (member* (cdr l))))
+        (else (or (member* a (car l))
+                  (member* a (cdr l))))))
+
+(define (leftmost l)
+  (cond ((atom? (car l)) (car l))
+        (else (leftmost (car l)))))
+
+(define (eqlist? l1 l2)
+  (cond ((and (null? l1)
+              (null? l2) #t))
+        ((or (null? l1)
+             (null? l2)) #f)
+        (else
+         (and (equal? (car l1) (car l2))
+              (eqlist? (cdr l1) (cdr l2))))))
+
+(define (equal? s1 s2)
+  (cond ((and (atom? s1)
+              (atom? s2)) (eqan? s1 s2))
+        ((or (atom? s1) (atom? s2)) #f)
+        (else (eqlist? s1 s2))))
+
