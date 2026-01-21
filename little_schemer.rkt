@@ -265,3 +265,30 @@
         ((or (atom? s1) (atom? s2)) #f)
         (else (eqlist? s1 s2))))
 
+(define (numbered? aexp)
+  (cond ((atom? aexp) (number? aexp))
+        (else
+         (and (numbered? (car aexp))
+              (numbered? (car (cdr (cdr aexp))))))))
+
+(define (1st-sub-exp aexp)
+  (car aexp))
+
+(define (2nd-sub-exp aexp)
+  (caddr aexp))
+
+(define (operator aexp)
+  (cadr aexp))
+
+(define (value nexp)
+  (cond
+    ((atom? nexp) nexp)
+    ((eq? (operator nexp) (quote +))
+     (+ (value (1st-sub-exp nexp))
+        (value (2nd-sub-exp nexp))))
+    ((eq? (operator nexp) (quote *))
+     (* (value (1st-sub-exp nexp))
+        (value (2nd-sub-exp nexp))))
+    (else
+     (pow (value (1st-sub-exp nexp))
+        (value (2nd-sub-exp nexp))))))
