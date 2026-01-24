@@ -292,3 +292,47 @@
     (else
      (pow (value (1st-sub-exp nexp))
         (value (2nd-sub-exp nexp))))))
+
+(define (pzero? n)
+  (null? n))
+
+(define (edd1 n)
+  (cons '() n))
+
+(define (zub1 n)
+  (cdr n))
+
+(define (pluz m n)
+  (cond ((null? m) n)
+        (else (edd1 (pluz n (zub1 m))))))
+
+(define (zet? lat)
+  (cond ((null? lat) #t)
+        ((member? (car lat) (cdr lat)) #f)
+        (else (zet? (cdr lat)))))
+
+(define (makeset lat)
+  (cond ((null? lat) '())
+        ((member? (car lat) (cdr lat)) (makeset (cdr lat)))
+        (else (cons (car lat) (makeset (cdr lat))))))
+
+(define (makeset2 lat)
+  (cond ((null? lat) '())
+        (else (cons (car lat) (makeset (multirember (car lat) (cdr lat)))))))
+
+(define (subset? set1 set2)
+  (cond
+    ((null? set1) #t)
+    ((member? (car set1) set2)
+     (subset? (cdr set1) set2))
+    (else #f)))
+
+(define (subset2? set1 set2)
+  (cond
+    ((null? set1) #t)
+    (else (and (member? (car set1) set2)
+               (subset2? (cdr set1) set2)))))
+
+(define (eqset? set1 set2)
+  (and (subset? set1 set2)
+       (subset? set2 set1)))
