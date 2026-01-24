@@ -27,6 +27,10 @@
         (else (cons (car (car l))
                     (firsts (cdr l))))))
 
+(define (seconds l)
+  (cond ((null? l) '())
+        (else (cons (cadar l) (seconds (cdr l))))))
+
 (define (insertR new old lat)
   (cond ((null? lat) '())
         ((eq? (car lat) old) (cons (car lat)
@@ -336,3 +340,78 @@
 (define (eqset? set1 set2)
   (and (subset? set1 set2)
        (subset? set2 set1)))
+
+(define (intersect? s1 s2)
+  (cond ((null? s1) #f)
+        ((member? (car s1) s2) #t)
+        (else (intersect? (cdr s1) s2))))
+
+(define (intersector? s1 s2)
+  (cond ((null? s1) #f)
+        ((or (member? (car s1) s2)
+             (intersect? (cdr s1) s2)))))
+
+
+(define (intersect s1 s2)
+  (cond ((null? s1) '())
+        ((member? (car s1) s2)
+         (cons (car s1) (intersect (cdr s1) s2)))
+        (else (intersect (cdr s1) s2))))
+
+(define (union s1 s2)
+  (cond ((null? s1) s2)
+        ((member? (car s1) s2)
+         (union (cdr s1) s2))
+        (else (cons (car s1) (union (cdr s1) s2)))))
+
+(define (difference s1 s2)
+  (cond ((null? s1) '())
+        ((member? (car s1) s2)
+         (difference (cdr s1) s2))
+        (else (cons (car s1) (difference (cdr s1) s2)))))
+
+(define (intersectall l-set)
+  (cond ((null? (cdr l-set)) (car l-set))
+        (else (intersect (car l-set)
+                         (intersectall (cdr l-set))))))
+
+(define (a-pair? p)
+  (cond ((atom? p) #f)
+        ((null? p) #f)
+        ((null? (cdr p)) #f)
+        ((null? (cdr (cdr p))) #t)
+        (else #f)))
+
+(define (first p)
+  (car p))
+
+(define (second p)
+  (car (cdr p)))
+
+(define (build a b)
+  (cons a (cons b '())))
+
+(define (fun? rel)
+  (zet? (firsts rel)))
+
+(define (revrel1 rel)
+  (cond
+    ((null? rel) '())
+    (else (cons (build (second (car rel)) (first (car rel)))
+              (revrel1 (cdr rel))))))
+
+(define (revpair p)
+  (build (second p) (first p)))
+
+(define (revrel rel)
+  (cond
+    ((null? rel) '())
+    (else (cons (revpair (car rel))
+                (revrel (cdr rel))))))  
+
+(define (fullfun? rel)
+  (and (fun? rel)
+       (set? (seconds rel))))
+
+(define (one-to-one? fun)
+  (fun? (revrel fun)))
