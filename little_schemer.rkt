@@ -415,3 +415,91 @@
 
 (define (one-to-one? fun)
   (fun? (revrel fun)))
+
+(define (rember-f test? a l)
+  (cond ((null? l) '())
+        ((test? (car l) a) (cdr l))
+        (else (cons (car l)
+                    (rember-f test? a (cdr l))))))
+
+(define (eq?-c a)
+  (lambda (x)
+    (eq? x a)))
+
+(define (rember-f-lambda test?)
+  (lambda (a l)
+    (cond ((null? l) '())
+          ((test? (car l) a) (cdr l))
+          (else (cons (car l)
+                      ((rember-f-lambda test?)
+                      a
+                      (cdr l)))))))
+
+(define rember-eq? (rember-f-lambda eq?))
+
+(define (insertL-f test?)
+  (lambda (new old l)
+    (cond ((null? l) '())
+          ((test? old (car l)) (cons new l))
+          (else (cons (car l)
+                      ((insertL-f test?) new old (cdr l)))))))
+
+(define (insertR-f test?)
+  (lambda (new old l)
+    (cond ((null? l) '())
+          ((test? old (car l)) (cons (car l) (cons new (cdr l))))
+          (else (cons (car l)
+                      ((insertR-f test?) new old (cdr l)))))))
+
+(define (seqL new old l)
+  (cons new (cons old (cdr l))))
+
+(define (seqR new old l)
+  (cons old (cons new (cdr l))))
+
+(define (insert-g test? seq)
+  (lambda (new old l)
+    (cond ((null? l) '())
+          ((test? old (car l)) (seq new old l))
+          (else (cons (car l)
+                      ((insert-g test? seq) new old (cdr l)))))))
+
+(define insertR-g (insert-g equal? seqR))
+(define insertL-g (insert-g equal? seqL))
+
+(define insertR-g2 (insert-g equal?
+                             (lambda (new old l)
+                               (cons new (cons old (cdr l))))))
+
+(define insertL-g2 (insert-g equal?
+                             (lambda (new old l)
+                               (cons old (cons new (cdr l))))))
+
+(define (seqS new old l)
+  (cons new (cdr l)))
+
+(define subst-g (insert-g equal? seqS))
+
+(define (multirember-f test?)
+  (lambda (a l)
+    (cond ((null? l) '())
+          ((test? a (car l)) ((multirember-f test?) a (cdr l)))
+          (else (cons (car l) ((multirember-f test?) a (cdr l)))))))
+
+(define multirember-eq? (multirember-f eq?))
+
+(define eq?-tuna
+  (eq?-c 'tuna))
+
+(define (multiremberT test-c? lat)
+    (cond
+      ((null? lat) '())
+      ((test-c? (car lat)) (multiremberT test-c? (cdr lat)))
+      (else (cons (car lat) (multiremberT test-c? (cdr lat))))))
+
+(define (a-friend x y)
+  (null? y))
+
+(define (new-friend newlat seen)
+  (a-friend newlat
+            (cons 'tuna seen)))
